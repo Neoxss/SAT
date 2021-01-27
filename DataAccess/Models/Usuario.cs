@@ -12,6 +12,7 @@ namespace DataAccess.Models
         public string Nombre { get; set; }
         public string Matricula { get; set; }
         public string Correo { get; set; }
+        public string Password { get; set; }
 
     }
 }

@@ -14,11 +14,17 @@ namespace DataAccess
         {
             modelBuilder.Entity<Usuario>().ToTable("Usuarios", "UserInfo");
             modelBuilder.Entity<Sala>().ToTable("Salas", "Proceso");
+            modelBuilder.Entity<Rol>().ToTable("Roles", "UserInfo");
+            modelBuilder.Entity<Sesion>().ToTable("Sesiones", "Seguridad");
+
 
             Database.SetInitializer<SATContext>(null);
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Usuario> Usuarios { get; set; }   
-        public DbSet<Sala> Salas { get; set; }   
+        public DbSet<Sala> Salas { get; set; }
+        public DbSet<Rol> Roles { get; set; }
+        public DbSet<Sesion> Sesiones { get; set; }
+
     }
 }

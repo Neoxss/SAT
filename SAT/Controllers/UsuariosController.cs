@@ -44,5 +44,29 @@ namespace SAT.Controllers
                 return Ok(e);
             }
         }
+        [HttpPost]
+        public IHttpActionResult Login(string correo, string password)
+        {
+            try
+            {
+                using (SATContext entities = new SATContext())
+                {
+
+                    var user = entities.Usuarios.FirstOrDefault(e => e.Correo == correo && e.Password == password );
+                    if(user != null)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return Ok(e);
+            }
+        }
     }
 }

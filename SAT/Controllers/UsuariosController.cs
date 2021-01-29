@@ -45,14 +45,14 @@ namespace SAT.Controllers
             }
         }
         [HttpPost]
-        public IHttpActionResult Login(string correo, string password)
+        public IHttpActionResult Login(LoginModel loginModel)
         {
             try
             {
                 using (SATContext entities = new SATContext())
                 {
 
-                    var user = entities.Usuarios.FirstOrDefault(e => e.Correo == correo && e.Password == password );
+                    var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password );
                     if(user != null)
                     {
                         return Ok();

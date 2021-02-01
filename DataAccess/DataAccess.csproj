@@ -55,6 +55,7 @@
     <Compile Include="Models\Rol.cs" />
     <Compile Include="Models\RolUsuario.cs" />
     <Compile Include="Models\Sala.cs" />
+    <Compile Include="Models\SalaUsuario.cs" />
     <Compile Include="Models\Sesion.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="obj\Debug\.NETFramework,Version=v4.7.2.AssemblyAttributes.cs" />

@@ -17,6 +17,7 @@ namespace DataAccess
             modelBuilder.Entity<Rol>().ToTable("Roles", "UserInfo");
             modelBuilder.Entity<Sesion>().ToTable("Sesiones", "Seguridad");
             modelBuilder.Entity<RolUsuario>().ToTable("Rol_Usuario", "UserInfo");
+            modelBuilder.Entity<SalaUsuario>().ToTable("Salas_Usuarios", "Proceso");
 
             Database.SetInitializer<SATContext>(null);
             base.OnModelCreating(modelBuilder);
@@ -26,6 +27,7 @@ namespace DataAccess
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Sesion> Sesiones { get; set; }
         public DbSet<RolUsuario> RolUsuarios { get; set; }
+        public DbSet<SalaUsuario> SalaUsuarios { get; set; }
 
     }
 }

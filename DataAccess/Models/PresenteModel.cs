@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Models
 {
-    public class LoginModel
+    public class PresenteModel
     {
-        public string Correo { get; set; }
-        public string Password { get; set; }
-        public int IdDispositivo { get; set; }
+        public int IdSala { get; set; }
+        public bool Presente { get; set; }
     }
 }

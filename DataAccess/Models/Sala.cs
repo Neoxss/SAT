@@ -23,6 +23,6 @@ namespace DataAccess.Models
         public string MomentoInicio { get; set; }
         public string Duracion { get; set; }
         public string Host { get; set; }
-
+        public int Intervalo { get; set; }
     }
 }

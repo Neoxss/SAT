@@ -18,12 +18,17 @@ namespace SAT.Controllers
             string Token = string.Empty;
             string IdUsuario = string.Empty;
 
-            if (Request.Headers.Contains("usuario"))
+            if (Request.Headers.Contains("token"))
             {
-                Token = Request.Headers.GetValues("usuario").First();
-                IdUsuario = entities.Usuarios.SingleOrDefault(u => u.Nombre == Token).ID;
+                Token = Request.Headers.GetValues("token").First();
+                IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token).Usuario;
+            }
+            else
+            {
+                return Unauthorized();
             }
 
+            //TODO: Agregar los Roles como Enum en el proyecto
             EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == 2));
 
             //Crear sala y guardarla en DB
@@ -53,13 +58,18 @@ namespace SAT.Controllers
             SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
-            bool EstaDentro = false; 
+            bool EstaDentro = false;
 
-            if (Request.Headers.Contains("usuario"))
+            if (Request.Headers.Contains("token"))
             {
-                Token = Request.Headers.GetValues("usuario").First();
-                IdUsuario = entities.Usuarios.SingleOrDefault(u => u.Nombre == Token).ID;
+                Token = Request.Headers.GetValues("token").First();
+                IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token).Usuario;
             }
+            else
+            {
+                return Unauthorized();
+            }
+
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
 
             if (!EstaDentro)
@@ -67,6 +77,38 @@ namespace SAT.Controllers
                 SalaUsuario salaUsuario = new SalaUsuario();
                 salaUsuario.IdSala = IdSala;
                 salaUsuario.IdUsuario = IdUsuario;
+                entities.SalaUsuarios.Add(salaUsuario);
+                entities.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+
+        public IHttpActionResult Presente(PresenteModel presenteModel)
+        {
+            SATContext entities = new SATContext();
+            string Token = string.Empty;
+            string IdUsuario = string.Empty;
+            bool EstaDentro = false;
+
+            if (Request.Headers.Contains("token"))
+            {
+                Token = Request.Headers.GetValues("token").First();
+                IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token).Usuario;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+            EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == presenteModel.IdSala && e.IdUsuario == IdUsuario);
+
+            if (EstaDentro)
+            {
+                SalaUsuario salaUsuario = new SalaUsuario();
+                salaUsuario.IdSala = presenteModel.IdSala;
+                salaUsuario.IdUsuario = IdUsuario;
+                salaUsuario.Presente = presenteModel.Presente;
                 entities.SalaUsuarios.Add(salaUsuario);
                 entities.SaveChanges();
                 return Ok();

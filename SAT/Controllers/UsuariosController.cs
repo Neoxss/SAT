@@ -55,7 +55,8 @@ namespace SAT.Controllers
                     var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password );
                     if(user != null)
                     {
-                        return Ok();
+                        string token = generarToken(user.ID, loginModel.IdDispositivo);
+                        return Ok(new { token });
                     }
                     else
                     {
@@ -67,6 +68,25 @@ namespace SAT.Controllers
             {
                 return Ok(e);
             }
+        }
+
+        //True token generado, si no, no se genera el token
+        private string generarToken(string usuario, int idDispositivo)
+        {
+            SATContext entities = new SATContext();
+            bool existe = false;
+
+            string tokenGenerado = Guid.NewGuid().ToString();
+            
+            Sesion sesion = new Sesion();
+            sesion.Usuario = usuario;
+            sesion.IdDispositivo = idDispositivo;
+            sesion.Vigencia = DateTime.Now;
+            sesion.Token = tokenGenerado;
+            entities.Sesiones.Add(sesion);
+            entities.SaveChanges();
+
+            return tokenGenerado;
         }
     }
 }

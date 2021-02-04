@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\PresenteModel.cs" />
     <Compile Include="Models\Rol.cs" />
     <Compile Include="Models\RolUsuario.cs" />
     <Compile Include="Models\Sala.cs" />

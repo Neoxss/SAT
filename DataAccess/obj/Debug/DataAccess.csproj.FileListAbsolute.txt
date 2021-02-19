@@ -21,3 +21,4 @@ C:\Users\Luis\source\repos\SAT\DataAccess\obj\Debug\DataAccess.csproj.CoreCompil
 C:\Users\Luis\source\repos\SAT\DataAccess\obj\Debug\DataAccess.csproj.CopyComplete
 C:\Users\Luis\source\repos\SAT\DataAccess\obj\Debug\DataAccess.dll
 C:\Users\Luis\source\repos\SAT\DataAccess\obj\Debug\DataAccess.pdb
+C:\Users\user\Documents\SAT\DataAccess\bin\Debug\Newtonsoft.Json.dll

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Models
 {
-    public class PresenteModel
+    public enum Roles
     {
-        public int IdSala { get; set; }
-        public bool Presente { get; set; }
+        Estudiante = 1, 
+        Profesor = 2
     }
 }

@@ -1,3 +1,15 @@
 
 SAT/Web.config
 SAT/bin/SAT.dll.config
+SAT/.bin
+*.dll
+*.pdb
+*.cache
+*.cache
+*.dll
+*.pdb
+*.dll
+*.pdb
+*.dll
+*.dll
+*.pdb

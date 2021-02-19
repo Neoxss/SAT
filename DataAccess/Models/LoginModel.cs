@@ -10,6 +10,5 @@ namespace DataAccess.Models
     {
         public string Correo { get; set; }
         public string Password { get; set; }
-        public int IdDispositivo { get; set; }
     }
 }

@@ -2,7 +2,10 @@
 using DataAccess.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 
 namespace SAT.Controllers
@@ -10,25 +13,82 @@ namespace SAT.Controllers
     public class UsuariosController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult Get()
+        public HttpResponseMessage ListaEstudiantes(int idClase)
         {
-            using (SATContext entities = new SATContext())
+            SATContext entities = new SATContext();
+            string Token = string.Empty;
+            string IdUsuario = string.Empty;
+            int Dispositivo = 0;
+            if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
-                List<Usuario> usuarios = entities.Usuarios.ToList();
-                return Ok(usuarios);
+                Token = Request.Headers.GetValues("token").FirstOrDefault();
+                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (IdDispositivo == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                }
+                Dispositivo = int.Parse(IdDispositivo);
+                IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
+            else
+            {
+                //No esta autorizado para entrar
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+            }
+
+            if (entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == idClase) == null)
+            {
+                //No se encontro ninguna sala con ese ID
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No se encontro una sala con ese ID");
+            }
+
+            var usuarios = (from sala in entities.SalaUsuarios
+                               where sala.IdSala == idClase
+                               select new { sala.IdSala, 
+                                            sala.Presente,
+                                            sala.Usuarios.Correo,
+                                            sala.Usuarios.Matricula,
+                                            sala.Usuarios.Nombre}).ToList();
+
+            return Request.CreateResponse(HttpStatusCode.OK, usuarios);
         }
         [HttpGet]
-        public Usuario Get(int id)
+        public HttpResponseMessage ObtenerUsuarioPorId(string id)
         {
-            using (SATContext entities = new SATContext())
+            SATContext entities = new SATContext();
+            string Token = string.Empty;
+            string IdUsuario = string.Empty;
+            int Dispositivo = 0;
+            if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
-                return entities.Usuarios.FirstOrDefault(e => e.ID == id.ToString());
+                Token = Request.Headers.GetValues("token").FirstOrDefault();
+                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (IdDispositivo == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                }
+                Dispositivo = int.Parse(IdDispositivo);
+                IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
+            else
+            {
+                //No esta autorizado para entrar
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+            }
+
+            if (entities.Usuarios.FirstOrDefault(e => e.IdUsuario == id) == null)
+            {
+                //No se encontro ninguna sala con ese ID
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No se encontro ninguna sala con ese ID");
+            }
+
+            var usuario = entities.Usuarios.FirstOrDefault(u => u.IdUsuario == id);
+
+            return Request.CreateResponse(HttpStatusCode.OK, usuario);
         }
 
         [HttpPost]
-        public IHttpActionResult Post(Usuario usuario)
+        public HttpResponseMessage Post(Usuario usuario)
         {
             try
             {
@@ -36,42 +96,49 @@ namespace SAT.Controllers
                 {
                     entities.Usuarios.Add(usuario);
                     entities.SaveChanges();
-                    return Ok();
+                    return Request.CreateResponse(HttpStatusCode.OK, "success");
                 }
             }
             catch (Exception e)
             {
-                return Ok(e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
         [HttpPost]
-        public IHttpActionResult Login(LoginModel loginModel)
+        public HttpResponseMessage Login(LoginModel loginModel)
         {
-            try
+            SATContext entities = new SATContext();
+            string Token = string.Empty;
+            string IdUsuario = string.Empty;
+            int Dispositivo = 0;
+            if (Request.Headers.Contains("dispositivo"))
             {
-                using (SATContext entities = new SATContext())
+                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(IdDispositivo))
                 {
-
-                    var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password );
-                    if(user != null)
-                    {
-                        string token = generarToken(user.ID, loginModel.IdDispositivo);
-                        return Ok(new { token });
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
+                Dispositivo = int.Parse(IdDispositivo);
             }
-            catch (Exception e)
+            else
             {
-                return Ok(e);
+                //No esta autorizado para entrar
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+            }
+
+            var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
+            if (user != null)
+            {
+                string token = GenerarToken(user.IdUsuario, Dispositivo);
+                return Request.CreateResponse(HttpStatusCode.OK, new { token });
+            }
+            else
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
             }
         }
 
-        //True token generado, si no, no se genera el token
-        private string generarToken(string usuario, int idDispositivo)
+        private string GenerarToken(string usuario, int idDispositivo)
         {
             SATContext entities = new SATContext();
             bool existe = false;

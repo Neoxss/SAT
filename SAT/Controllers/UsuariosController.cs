@@ -13,21 +13,20 @@ namespace SAT.Controllers
     public class UsuariosController : ApiController
     {
         [HttpGet]
-        public HttpResponseMessage ListaEstudiantes(int idClase)
+        public HttpResponseMessage ListaEstudiantes(int idSala)
         {
             SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
                 Token = Request.Headers.GetValues("token").FirstOrDefault();
-                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
-                if (IdDispositivo == null)
+                Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(Dispositivo))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
@@ -36,14 +35,14 @@ namespace SAT.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
             }
 
-            if (entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == idClase) == null)
+            if (entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == idSala) == null)
             {
                 //No se encontro ninguna sala con ese ID
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No se encontro una sala con ese ID");
             }
 
             var usuarios = (from sala in entities.SalaUsuarios
-                               where sala.IdSala == idClase
+                               where sala.IdSala == idSala
                                select new { sala.IdSala, 
                                             sala.Presente,
                                             sala.Usuarios.Correo,
@@ -58,16 +57,15 @@ namespace SAT.Controllers
             SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
                 Token = Request.Headers.GetValues("token").FirstOrDefault();
-                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
-                if (IdDispositivo == null)
+                Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(Dispositivo))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
@@ -90,6 +88,8 @@ namespace SAT.Controllers
         [HttpPost]
         public HttpResponseMessage Post(Usuario usuario)
         {
+
+            //Validar que no se creen usuarios repetidos
             try
             {
                 using (SATContext entities = new SATContext())
@@ -110,7 +110,7 @@ namespace SAT.Controllers
             SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("dispositivo"))
             {
                 string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
@@ -118,7 +118,7 @@ namespace SAT.Controllers
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
+                Dispositivo = (IdDispositivo);
             }
             else
             {
@@ -138,7 +138,7 @@ namespace SAT.Controllers
             }
         }
 
-        private string GenerarToken(string usuario, int idDispositivo)
+        private string GenerarToken(string usuario, string idDispositivo)
         {
             SATContext entities = new SATContext();
             bool existe = false;

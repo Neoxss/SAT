@@ -12,22 +12,21 @@ namespace SAT.Controllers
     public class SalasController : ApiController
     {
         [HttpPost]
-        public HttpResponseMessage Crear()
+        public HttpResponseMessage Crear(CrearSalaModel crearSalaModel)
         {
             SATContext entities = new SATContext();
             bool EsProfesor = false;
             string Token = string.Empty;
             string IdUsuario = string.Empty;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
                 Token = Request.Headers.GetValues("token").FirstOrDefault();
-                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
-                if (IdDispositivo == null)
+                Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(Dispositivo))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
@@ -36,17 +35,19 @@ namespace SAT.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
             }
 
-            //TODO: Agregar los Roles como Enum en el proyecto
+            //Validar que el Host exista
+            
+
             EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int) Roles.Profesor));
 
             //Crear sala y guardarla en DB
             if (EsProfesor)
             {
-                Sala sala = new Sala("Sala del Profesor X", DateTime.Now, 120, IdUsuario);
+                Sala sala = new Sala(crearSalaModel.Nombre, DateTime.Now, crearSalaModel.Duracion, crearSalaModel.Intervalo, crearSalaModel.Host);
                 entities.Salas.Add(sala);
                 entities.SaveChanges();
 
-                return Request.CreateResponse(HttpStatusCode.OK, sala.IdSala);
+                return Request.CreateResponse(HttpStatusCode.OK, new { sala.IdSala });
             }
             else
             {
@@ -59,16 +60,15 @@ namespace SAT.Controllers
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             bool EstaDentro = false;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
                 Token = Request.Headers.GetValues("token").FirstOrDefault();
-                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
-                if (IdDispositivo == null)
+                Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(Dispositivo))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
@@ -82,6 +82,13 @@ namespace SAT.Controllers
             if (sala == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.OK, "El id de la sala no existe");
+            }
+
+            //Validar si ya paso el tiempo de la sala
+            TimeSpan span = DateTime.Now.Subtract(sala.MomentoInicio);
+            if(span.TotalMinutes > sala.Duracion)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.OK, "El tiempo de la sala se ha terminado");
             }
 
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
@@ -104,16 +111,15 @@ namespace SAT.Controllers
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             bool EstaDentro = false;
-            int Dispositivo = 0;
+            string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
                 Token = Request.Headers.GetValues("token").FirstOrDefault();
-                string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
-                if (IdDispositivo == null)
+                Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
+                if (string.IsNullOrEmpty(Dispositivo))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
                 }
-                Dispositivo = int.Parse(IdDispositivo);
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else

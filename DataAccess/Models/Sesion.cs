@@ -15,7 +15,7 @@ namespace DataAccess.Models
         public string Token { get; set; }
         public DateTime Vigencia { get; set; }
         [Column("ID_Dispositivo")]
-        public int IdDispositivo { get; set; }
+        public string IdDispositivo { get; set; }
         public string Usuario { get; set; }
     }
 }

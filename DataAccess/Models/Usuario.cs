@@ -11,7 +11,7 @@ namespace DataAccess.Models
 {
     public class Usuario
     {
-        [Key, Column("ID")]
+        [Key, Column("ID_Usuario")]
         public string IdUsuario { get; set; }
         public string Nombre { get; set; }
         public string Matricula { get; set; }

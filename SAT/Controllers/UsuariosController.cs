@@ -141,15 +141,16 @@ namespace SAT.Controllers
         private string GenerarToken(string usuario, string idDispositivo)
         {
             SATContext entities = new SATContext();
-            bool existe = false;
 
             string tokenGenerado = Guid.NewGuid().ToString();
-            
-            Sesion sesion = new Sesion();
-            sesion.Usuario = usuario;
-            sesion.IdDispositivo = idDispositivo;
-            sesion.Vigencia = DateTime.Now;
-            sesion.Token = tokenGenerado;
+
+            Sesion sesion = new Sesion
+            {
+                Usuario = usuario,
+                IdDispositivo = idDispositivo,
+                Vigencia = DateTime.Now,
+                Token = tokenGenerado
+            };
             entities.Sesiones.Add(sesion);
             entities.SaveChanges();
 

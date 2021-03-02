@@ -17,7 +17,7 @@ namespace DataAccess.Models
         }
         public Sala() { }
 
-        [Key, Column("ID")]
+        [Key, Column("ID_Sala")]
         public int IdSala { get; set; }
         public string Nombre { get; set; }
         [Column("MomentoIncio")]

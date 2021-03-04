@@ -25,18 +25,17 @@ namespace SAT.Controllers
                 Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(Dispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Unathorized"));
             }
 
             //Validar que el Host exista
-            
 
             EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int) Roles.Profesor));
 
@@ -51,7 +50,7 @@ namespace SAT.Controllers
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.Forbidden, "Solo los profesores pueden crear las salas");
+                return Request.CreateResponse(HttpStatusCode.Forbidden, new RespuestaError("Solo los profesores pueden crear las salas"));
             }
         }
         public HttpResponseMessage Unirse(int IdSala)
@@ -67,28 +66,28 @@ namespace SAT.Controllers
                 Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(Dispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("No autorizado"));
             }
 
             Sala sala = entities.Salas.SingleOrDefault(e => e.IdSala == IdSala);
             //Validar si la sala existe
             if (sala == null)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.OK, "El id de la sala no existe");
+                return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El id de la sala no existe"));
             }
 
             //Validar si ya paso el tiempo de la sala
             TimeSpan span = DateTime.Now.Subtract(sala.MomentoInicio);
             if(span.TotalMinutes > sala.Duracion)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.OK, "El tiempo de la sala se ha terminado");
+                return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El tiempo de la sala se ha terminado"));
             }
 
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
@@ -118,21 +117,21 @@ namespace SAT.Controllers
                 Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(Dispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Unathorized"));
             }
 
             Sala sala = entities.Salas.SingleOrDefault(e => e.IdSala == IdSala);
             //Validar si la sala existe
             if (sala == null)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.OK, "El id de la sala no existe");
+                return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El id de la sala no existe"));
             }
 
             SalaUsuario salaUsuario = entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
@@ -141,7 +140,7 @@ namespace SAT.Controllers
             //Validar si no se encontro al usuario
             if (salaUsuario == null) 
             {
-                return Request.CreateErrorResponse(HttpStatusCode.OK, "El id de la sala no existe");
+                return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El id de la sala no existe"));
             }
 
             //Validar si ya esta dentro de la sala

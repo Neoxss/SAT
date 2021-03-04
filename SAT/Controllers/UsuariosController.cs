@@ -25,20 +25,20 @@ namespace SAT.Controllers
                 Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(Dispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Unathorized"));
             }
 
             if (entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == idSala) == null)
             {
                 //No se encontro ninguna sala con ese ID
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No se encontro una sala con ese ID");
+                return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No se encontro una sala con ese ID"));
             }
 
             var usuarios = (from sala in entities.SalaUsuarios
@@ -64,20 +64,20 @@ namespace SAT.Controllers
                 Dispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(Dispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 IdUsuario = entities.Sesiones.SingleOrDefault(u => u.Token == Token && u.IdDispositivo == Dispositivo).Usuario;
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Unathorized"));
             }
 
             if (entities.Usuarios.FirstOrDefault(e => e.IdUsuario == id) == null)
             {
                 //No se encontro ninguna sala con ese ID
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No se encontro ninguna sala con ese ID");
+                return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No se encontro ninguna sala con ese ID"));
             }
 
             var usuario = entities.Usuarios.FirstOrDefault(u => u.IdUsuario == id);
@@ -101,7 +101,7 @@ namespace SAT.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new RespuestaError(e.Message));
             }
         }
         [HttpPost]
@@ -116,14 +116,14 @@ namespace SAT.Controllers
                 string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
                 if (string.IsNullOrEmpty(IdDispositivo))
                 {
-                    return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Dispositivo Desconocido");
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Dispositivo Desconocido"));
                 }
                 Dispositivo = (IdDispositivo);
             }
             else
             {
                 //No esta autorizado para entrar
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unathorized");
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new RespuestaError("Unathorized"));
             }
 
             var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
@@ -134,7 +134,7 @@ namespace SAT.Controllers
             }
             else
             {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
+                return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("Usuario no encontrado"));
             }
         }
 

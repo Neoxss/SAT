@@ -21,3 +21,5 @@ C:\Users\user\Documents\SAT\DataAccess\obj\Debug\DataAccess.csproj.CoreCompileIn
 C:\Users\user\Documents\SAT\DataAccess\obj\Debug\DataAccess.csproj.CopyComplete
 C:\Users\user\Documents\SAT\DataAccess\obj\Debug\DataAccess.dll
 C:\Users\user\Documents\SAT\DataAccess\obj\Debug\DataAccess.pdb
+C:\Users\user\Documents\SAT\DataAccess\bin\Debug\Newtonsoft.Json.xml
+C:\Users\user\Documents\SAT\DataAccess\obj\Debug\DataAccess.csprojAssemblyReference.cache

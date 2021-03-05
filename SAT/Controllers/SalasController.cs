@@ -90,18 +90,22 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El tiempo de la sala se ha terminado"));
             }
 
+            SalaUsuario salaUsuario = new SalaUsuario();
+            salaUsuario.IdSala = IdSala;
+            salaUsuario.IdUsuario = IdUsuario;
+            entities.SalaUsuarios.Add(salaUsuario);
+            entities.SaveChanges();
+            var clase = new { sala.Nombre, sala.MomentoInicio, sala.Duracion, sala.Host };
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
 
             if (!EstaDentro)
             {
-                SalaUsuario salaUsuario = new SalaUsuario();
-                salaUsuario.IdSala = IdSala;
-                salaUsuario.IdUsuario = IdUsuario;
-                entities.SalaUsuarios.Add(salaUsuario);
-                entities.SaveChanges();
-                return Request.CreateResponse(HttpStatusCode.Created, new Respuesta<object>("Se ha unido a la sala #" + IdSala + " satisfactoriamente", null));
+                return Request.CreateResponse(HttpStatusCode.Created, new Respuesta<object>("Se ha unido a la sala #" + IdSala + " satisfactoriamente", new { clase }));
             }
-            return Request.CreateResponse(HttpStatusCode.OK, "Ya esta dentro");
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Ya esta dentro de la sala", new { clase }));
+            }
         }
 
         public HttpResponseMessage Presente(int IdSala)

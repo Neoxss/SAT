@@ -112,6 +112,7 @@ namespace SAT.Controllers
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             string Dispositivo = string.Empty;
+            bool EsProfesor = false;
             if (Request.Headers.Contains("dispositivo"))
             {
                 string IdDispositivo = Request.Headers.GetValues("dispositivo").FirstOrDefault();
@@ -128,13 +129,14 @@ namespace SAT.Controllers
             }
 
             var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
-            
+
             //Validar si es estudiante o profesor
+            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int)Roles.Profesor));
 
             if (user != null)
             {
                 string token = GenerarToken(user.IdUsuario, Dispositivo);
-                var usuario = new { user.Correo, user.Nombre, user.Matricula};
+                var usuario = new { user.Correo, user.Nombre, user.Matricula, EsProfesor};
                 return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Logeado correctamente", new {usuario , token }));
             }
             else

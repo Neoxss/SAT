@@ -131,7 +131,7 @@ namespace SAT.Controllers
             var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
 
             //Validar si es estudiante o profesor
-            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int)Roles.Profesor));
+            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == user.IdUsuario && u.IdRol == (int)Roles.Profesor));
 
             if (user != null)
             {

@@ -95,7 +95,7 @@ namespace SAT.Controllers
             salaUsuario.IdUsuario = IdUsuario;
             entities.SalaUsuarios.Add(salaUsuario);
             entities.SaveChanges();
-            var clase = new { sala.Nombre, sala.MomentoInicio, sala.Duracion, sala.Host };
+            var clase = new { sala.IdSala, sala.Nombre, sala.MomentoInicio, sala.Duracion, sala.Host };
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
 
             if (!EstaDentro)

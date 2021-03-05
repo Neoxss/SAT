@@ -46,7 +46,7 @@ namespace SAT.Controllers
                 entities.Salas.Add(sala);
                 entities.SaveChanges();
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { sala.IdSala });
+                return Request.CreateResponse(HttpStatusCode.OK,  new Respuesta<object>("Sala creada correctamente", new { sala.IdSala }));
             }
             else
             {
@@ -99,7 +99,7 @@ namespace SAT.Controllers
                 salaUsuario.IdUsuario = IdUsuario;
                 entities.SalaUsuarios.Add(salaUsuario);
                 entities.SaveChanges();
-                return Request.CreateResponse(HttpStatusCode.OK, "Se ha unido a la sala #" +IdSala+" satisfactoriamente");
+                return Request.CreateResponse(HttpStatusCode.Created, new Respuesta<object>("Se ha unido a la sala #" + IdSala + " satisfactoriamente", null));
             }
             return Request.CreateResponse(HttpStatusCode.OK, "Ya esta dentro");
         }
@@ -146,10 +146,10 @@ namespace SAT.Controllers
             //Validar si ya esta dentro de la sala
             if (salaUsuario != null && EstaDentro)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, "Ya esta Presente en la sala");
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Ya esta Presente en la sala", null));
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Presente!");
+            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Presente!", null));
         }
     }
 }

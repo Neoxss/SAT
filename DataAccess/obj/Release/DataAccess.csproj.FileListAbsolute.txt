@@ -10,5 +10,4 @@ C:\Users\user\Documents\SAT\DataAccess\obj\Release\DataAccess.csproj.CoreCompile
 C:\Users\user\Documents\SAT\DataAccess\obj\Release\DataAccess.csproj.CopyComplete
 C:\Users\user\Documents\SAT\DataAccess\obj\Release\DataAccess.dll
 C:\Users\user\Documents\SAT\DataAccess\obj\Release\DataAccess.pdb
-C:\Users\user\Documents\SAT\DataAccess\bin\Release\Newtonsoft.Json.xml
 C:\Users\user\Documents\SAT\DataAccess\obj\Release\DataAccess.csprojAssemblyReference.cache

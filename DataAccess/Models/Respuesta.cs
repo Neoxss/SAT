@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Models
 {
-    public class RespuestaError
+    public class Respuesta<T>
     {
-        public RespuestaError(string mensaje)
+        public Respuesta(string mensaje, T data)
         {
             Mensaje = mensaje;
+            Data = data;
         }
-        public string Mensaje { get; set; }
 
+        public string Mensaje { get; set; }
+        public T Data { get; set; }
     }
 }

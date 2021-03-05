@@ -41,7 +41,7 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No se encontro una sala con ese ID"));
             }
 
-            var usuarios = (from sala in entities.SalaUsuarios
+            var estudiantes = (from sala in entities.SalaUsuarios
                                where sala.IdSala == idSala
                                select new { sala.IdSala, 
                                             sala.Presente,
@@ -49,7 +49,8 @@ namespace SAT.Controllers
                                             sala.Usuarios.Matricula,
                                             sala.Usuarios.Nombre}).ToList();
 
-            return Request.CreateResponse(HttpStatusCode.OK, usuarios);
+            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Lista de usuarios de la clase", new { estudiantes }));
+
         }
         [HttpGet]
         public HttpResponseMessage ObtenerUsuarioPorId(string id)
@@ -80,9 +81,9 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No se encontro ninguna sala con ese ID"));
             }
 
-            var usuario = entities.Usuarios.FirstOrDefault(u => u.IdUsuario == id);
+            var estudiante = entities.Usuarios.FirstOrDefault(u => u.IdUsuario == id);
 
-            return Request.CreateResponse(HttpStatusCode.OK, usuario);
+            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Estudiante encontrado", new { estudiante }));
         }
 
         [HttpPost]
@@ -127,10 +128,14 @@ namespace SAT.Controllers
             }
 
             var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
+            
+            //Validar si es estudiante o profesor
+
             if (user != null)
             {
                 string token = GenerarToken(user.IdUsuario, Dispositivo);
-                return Request.CreateResponse(HttpStatusCode.OK, new { token });
+                var usuario = new { user.Correo, user.Nombre, user.Matricula};
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Logeado correctamente", new {usuario , token }));
             }
             else
             {

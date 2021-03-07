@@ -114,6 +114,7 @@ namespace SAT.Controllers
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             bool EstaDentro = false;
+            bool EstaPresente = false;
             string Dispositivo = string.Empty;
             if (Request.Headers.Contains("token") && Request.Headers.Contains("dispositivo"))
             {
@@ -150,10 +151,11 @@ namespace SAT.Controllers
             //Validar si ya esta dentro de la sala
             if (salaUsuario != null && EstaDentro)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Ya esta Presente en la sala", null));
+                EstaPresente = true;
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Ya esta Presente en la sala", new { EstaPresente, sala }));
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Presente!", null));
+            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Presente!", new { EstaPresente, sala }));
         }
     }
 }

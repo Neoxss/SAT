@@ -31,15 +31,8 @@ C:\Users\user\Documents\SAT\SAT\bin\roslyn\vbc.exe.config
 C:\Users\user\Documents\SAT\SAT\bin\roslyn\vbc.rsp
 C:\Users\user\Documents\SAT\SAT\bin\roslyn\VBCSCompiler.exe
 C:\Users\user\Documents\SAT\SAT\bin\roslyn\VBCSCompiler.exe.config
-C:\Users\user\Documents\SAT\SAT\bin\DataAccess.dll
-C:\Users\user\Documents\SAT\SAT\bin\DataAccess.pdb
-C:\Users\user\Documents\SAT\SAT\bin\DataAccess.dll.config
-C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csprojAssemblyReference.cache
-C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csproj.CoreCompileInputs.cache
-C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csproj.CopyComplete
-C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.dll
-C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.pdb
 C:\Users\user\Documents\SAT\SAT\bin\Antlr3.Runtime.dll
+C:\Users\user\Documents\SAT\SAT\bin\DataAccess.dll
 C:\Users\user\Documents\SAT\SAT\bin\EntityFramework.dll
 C:\Users\user\Documents\SAT\SAT\bin\EntityFramework.SqlServer.dll
 C:\Users\user\Documents\SAT\SAT\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
@@ -57,6 +50,8 @@ C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.Deployment.dll
 C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.dll
 C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.Razor.dll
 C:\Users\user\Documents\SAT\SAT\bin\WebGrease.dll
+C:\Users\user\Documents\SAT\SAT\bin\DataAccess.pdb
+C:\Users\user\Documents\SAT\SAT\bin\DataAccess.dll.config
 C:\Users\user\Documents\SAT\SAT\bin\EntityFramework.xml
 C:\Users\user\Documents\SAT\SAT\bin\EntityFramework.SqlServer.xml
 C:\Users\user\Documents\SAT\SAT\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
@@ -72,3 +67,8 @@ C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.xml
 C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.Deployment.xml
 C:\Users\user\Documents\SAT\SAT\bin\System.Web.WebPages.Razor.xml
 C:\Users\user\Documents\SAT\SAT\bin\Antlr3.Runtime.pdb
+C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csprojAssemblyReference.cache
+C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.csproj.CopyComplete
+C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.dll
+C:\Users\user\Documents\SAT\SAT\obj\Debug\SAT.pdb

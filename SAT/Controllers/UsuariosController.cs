@@ -41,13 +41,27 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No se encontro una sala con ese ID"));
             }
 
+            var a = new List<bool>();
+          
+
             var estudiantes = (from sala in entities.SalaUsuarios
                                where sala.IdSala == idSala
-                               select new { sala.IdSala, 
-                                            sala.Presente,
-                                            sala.Usuarios.Correo,
-                                            sala.Usuarios.Matricula,
-                                            sala.Usuarios.Nombre}).ToList();
+                               select new
+                               {  
+                                   sala.IdSala,
+                                   presente = a,
+                                   sala.Usuarios.Correo,
+                                   sala.Usuarios.Matricula,
+                                   sala.Usuarios.Nombre,
+                                   sala.Usuarios.IdUsuario
+                               }).ToList();
+
+            estudiantes.ForEach(e => e.presente.AddRange((from si in entities.SalasIntervalos
+                                                          join prein in entities.PresenciaIntervalos
+                                                          on si.IdSalaIntervalo equals prein.IdSalaIntervalo
+                                                          into lj from pi in lj.DefaultIfEmpty()
+                                                          where si.IdSala == idSala && pi.IdUsuario == e.IdUsuario
+                                                          select pi != null).ToList()));
 
             return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Lista de usuarios de la clase", new { estudiantes }));
 
@@ -129,14 +143,14 @@ namespace SAT.Controllers
 
             var user = entities.Usuarios.FirstOrDefault(e => e.Correo == loginModel.Correo && e.Password == loginModel.Password);
 
-            //Validar si es estudiante o profesor
-            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == user.IdUsuario && u.IdRol == (int)Roles.Profesor));
-
             if (user != null)
             {
+                //Validar si es estudiante o profesor
+                EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == user.IdUsuario && u.IdRol == (int)Roles.Profesor));
+
                 string token = GenerarToken(user.IdUsuario, Dispositivo);
-                var usuario = new { user.IdUsuario ,user.Correo, user.Nombre, user.Matricula, EsProfesor};
-                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Logeado correctamente", new {usuario , token }));
+                var usuario = new { user.IdUsuario, user.Correo, user.Nombre, user.Matricula, EsProfesor };
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Logeado correctamente", new { usuario, token }));
             }
             else
             {
@@ -153,8 +167,6 @@ namespace SAT.Controllers
             //Validar ID Dispositivo no sea diferente
 
             //Validar que el TOKEN este activo
-
-
 
             Sesion sesion = new Sesion
             {

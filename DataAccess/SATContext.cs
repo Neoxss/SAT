@@ -18,6 +18,8 @@ namespace DataAccess
             modelBuilder.Entity<Sesion>().ToTable("Sesiones", "Seguridad");
             modelBuilder.Entity<RolUsuario>().ToTable("Rol_Usuario", "UserInfo");
             modelBuilder.Entity<SalaUsuario>().ToTable("Salas_Usuarios", "Proceso");
+            modelBuilder.Entity<SalasIntervalos>().ToTable("Salas_Intervalos", "Proceso");
+            modelBuilder.Entity<PresenciaIntervalos>().ToTable("Presencia_Intervalos", "Proceso");
 
 
             Database.SetInitializer<SATContext>(null);
@@ -29,6 +31,7 @@ namespace DataAccess
         public DbSet<Sesion> Sesiones { get; set; }
         public DbSet<RolUsuario> RolUsuarios { get; set; }
         public DbSet<SalaUsuario> SalaUsuarios { get; set; }
-
+        public DbSet<SalasIntervalos> SalasIntervalos { get; set; }
+        public DbSet<PresenciaIntervalos> PresenciaIntervalos { get; set; }
     }
 }

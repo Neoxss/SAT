@@ -11,10 +11,11 @@ namespace SAT.Controllers
 {
     public class SalasController : ApiController
     {
+        private SATContext entities = new SATContext();
+
         [HttpPost]
         public HttpResponseMessage Crear(CrearSalaModel crearSalaModel)
         {
-            SATContext entities = new SATContext();
             bool EsProfesor = false;
             string Token = string.Empty;
             string IdUsuario = string.Empty;
@@ -37,7 +38,7 @@ namespace SAT.Controllers
 
             //Validar que el Host exista
 
-            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int) Roles.Profesor));
+            EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == IdUsuario && u.IdRol == (int)Roles.Profesor));
 
             //Crear sala y guardarla en DB
             if (EsProfesor)
@@ -45,8 +46,10 @@ namespace SAT.Controllers
                 Sala sala = new Sala(crearSalaModel.Nombre, DateTime.Now, crearSalaModel.Duracion, crearSalaModel.Intervalo, crearSalaModel.Host);
                 entities.Salas.Add(sala);
                 entities.SaveChanges();
+                CalcularIntervalos(sala);
+                entities.SaveChanges();
 
-                return Request.CreateResponse(HttpStatusCode.OK,  new Respuesta<object>("Sala creada correctamente", new { sala.IdSala }));
+                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Sala creada correctamente", new { sala.IdSala }));
             }
             else
             {
@@ -55,7 +58,6 @@ namespace SAT.Controllers
         }
         public HttpResponseMessage Unirse(int IdSala)
         {
-            SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             bool EstaDentro = false;
@@ -85,21 +87,20 @@ namespace SAT.Controllers
 
             //Validar si ya paso el tiempo de la sala
             TimeSpan span = DateTime.Now.Subtract(sala.MomentoInicio);
-            if(span.TotalMinutes > sala.Duracion)
+            if (span.TotalMinutes > sala.Duracion)
             {
                 return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El tiempo de la sala se ha terminado"));
             }
 
-            SalaUsuario salaUsuario = new SalaUsuario();
-            salaUsuario.IdSala = IdSala;
-            salaUsuario.IdUsuario = IdUsuario;
-            entities.SalaUsuarios.Add(salaUsuario);
-            entities.SaveChanges();
-            var clase = new { sala.IdSala, sala.Nombre, sala.MomentoInicio, sala.Duracion, sala.Host };
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
+            var Intervalos = ObternerIntervalos(sala.IdSala);
+            var clase = new { sala.IdSala, sala.Nombre, sala.MomentoInicio,sala.Duracion, sala.Host, Intervalos};
 
             if (!EstaDentro)
             {
+                SalaUsuario salaUsuario = new SalaUsuario { IdSala = IdSala, IdUsuario = IdUsuario };
+                entities.SalaUsuarios.Add(salaUsuario);
+                entities.SaveChanges();
                 return Request.CreateResponse(HttpStatusCode.Created, new Respuesta<object>("Se ha unido a la sala #" + IdSala + " satisfactoriamente", new { clase }));
             }
             else
@@ -110,7 +111,6 @@ namespace SAT.Controllers
 
         public HttpResponseMessage Presente(int IdSala)
         {
-            SATContext entities = new SATContext();
             string Token = string.Empty;
             string IdUsuario = string.Empty;
             bool EstaDentro = false;
@@ -139,23 +139,53 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El id de la sala no existe"));
             }
 
-            SalaUsuario salaUsuario = entities.SalaUsuarios.FirstOrDefault(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
             EstaDentro = entities.SalaUsuarios.Any(e => e.IdSala == IdSala && e.IdUsuario == IdUsuario);
-
-            //Validar si no se encontro al usuario
-            if (salaUsuario == null) 
+            
+            if (EstaDentro)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, new RespuestaError("El id de la sala no existe"));
+                SalasIntervalos salaIntervalo = entities.SalasIntervalos.SingleOrDefault(si => si.IdSala == IdSala && si.Inicio <= DateTime.Now && si.Fin >= DateTime.Now);
+                PresenciaIntervalos presenciaIntervalos = entities.PresenciaIntervalos.SingleOrDefault(pi => pi.IdSalaIntervalo == salaIntervalo.IdSalaIntervalo && pi.IdUsuario == IdUsuario);
+                if(salaIntervalo != null && presenciaIntervalos == null)
+                {
+                    entities.PresenciaIntervalos.Add(new PresenciaIntervalos { IdSalaIntervalo = salaIntervalo.IdSalaIntervalo, IdUsuario = IdUsuario });
+                    entities.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Presente!", new { }));
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, new RespuestaError("Ahora no es momento de decir presente... Atienda!"));
+                }
+
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new RespuestaError("No pertenece a esta sala"));
             }
 
-            //Validar si ya esta dentro de la sala
-            if (salaUsuario != null && EstaDentro)
+
+
+        }
+
+        private void CalcularIntervalos(Sala sala)
+        {
+            DateTime a = sala.MomentoInicio;
+            DateTime b = a.AddMinutes(sala.Duracion - a.Minute);
+            List<SalasIntervalos> c = new List<SalasIntervalos>();
+
+            while (a < b && a.AddMinutes(sala.Intervalo) <= b)
             {
-                EstaPresente = true;
-                return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Ya esta Presente en la sala", new { EstaPresente, sala }));
+                a = a.AddMinutes(sala.Intervalo);
+                c.Add(new SalasIntervalos { IdSala = sala.IdSala, Inicio = a, Fin = a.AddMinutes(2) });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Presente!", new { EstaPresente, sala }));
+            entities.SalasIntervalos.AddRange(c);
+        }
+
+        private List<int> ObternerIntervalos(int idSala)
+        {
+            DateTime ahora = DateTime.Now;
+            IEnumerable<SalasIntervalos> intervalos = entities.SalasIntervalos.Where(si => si.IdSala == idSala && si.Inicio > ahora).AsEnumerable();
+            return intervalos.Select(i => Convert.ToInt32(i.Inicio.Subtract(ahora).TotalSeconds)).ToList();
         }
     }
 }

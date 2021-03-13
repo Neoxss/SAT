@@ -87,10 +87,9 @@ namespace SAT.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Post(Usuario usuario)
+        public HttpResponseMessage CrearUsuario(Usuario usuario)
         {
-
-            //Validar que no se creen usuarios repetidos
+            //Este metodo es un metodo para fines de pruebas.
             try
             {
                 using (SATContext entities = new SATContext())
@@ -150,6 +149,12 @@ namespace SAT.Controllers
             SATContext entities = new SATContext();
 
             string tokenGenerado = Guid.NewGuid().ToString();
+
+            //Validar ID Dispositivo no sea diferente
+
+            //Validar que el TOKEN este activo
+
+
 
             Sesion sesion = new Sesion
             {

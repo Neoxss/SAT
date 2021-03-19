@@ -35,7 +35,7 @@ namespace SAT.Filters
 
                 // Verificando que el token sea válido o esté vigente
                 var sesion = new DataAccess.SATContext().Sesiones.SingleOrDefault(s => s.Token == token);
-                if (sesion == null || (sesion.Vigencia.AddHours(5)) < DateTime.Now)
+                if (sesion == null || sesion.Vigencia < DateTime.Now)
                 {
                     actionContext.Response = new System.Net.Http.HttpResponseMessage
                     {

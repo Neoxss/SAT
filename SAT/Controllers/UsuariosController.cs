@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using DataAccess.Models;
+using DataAccess.Models.DTOs;
 using SAT.Filters;
 using System;
 using System.Collections.Generic;
@@ -29,26 +30,31 @@ namespace SAT.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new RespuestaError("No es dueño de esta sala"));
             }
 
-            List<bool> a = new List<bool>();
             var estudiantes = (from s in entities.SalaUsuarios
                                where s.IdSala == idSala
-                               select new
+                               select new ListaEstudiante
                                {
-                                   s.IdSala,
-                                   presente = a,
-                                   s.Usuarios.Correo,
-                                   s.Usuarios.Matricula,
-                                   s.Usuarios.Nombre,
-                                   s.Usuarios.IdUsuario
+                                   IdSala = s.IdSala,
+                                   Correo = s.Usuarios.Correo,
+                                   Matricula = s.Usuarios.Matricula,
+                                   Nombre = s.Usuarios.Nombre,
+                                   IdUsuario = s.Usuarios.IdUsuario
                                }).ToList();
 
-            estudiantes.ForEach(e => e.presente.AddRange((from si in entities.SalasIntervalos
-                                                          join prein in entities.PresenciaIntervalos
-                                                          on si.IdSalaIntervalo equals prein.IdSalaIntervalo
-                                                          into lj
-                                                          from pi in lj.DefaultIfEmpty()
-                                                          where si.IdSala == idSala && pi.IdUsuario == e.IdUsuario
-                                                          select pi != null).ToList()));
+            estudiantes.ForEach(e =>
+            {
+                e.Presencia = new List<bool>();
+
+                e.Presencia.AddRange((from si in entities.SalasIntervalos
+                                      join prein in entities.PresenciaIntervalos
+                                      on new { si.IdSalaIntervalo, e.IdUsuario } equals
+                                         new { prein.IdSalaIntervalo, prein.IdUsuario }
+
+                                      into lj
+                                      from pi in lj.DefaultIfEmpty()
+                                      where si.IdSala == idSala
+                                      select pi != null).ToList());
+            });
 
             return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Lista de usuarios de la clase", new { estudiantes }));
 
@@ -96,10 +102,10 @@ namespace SAT.Controllers
             if (user != null)
             {
                 //Validar si es estudiante o profesor
-                bool esProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == user.IdUsuario && u.IdRol == (int)Roles.Profesor));
+                bool EsProfesor = (entities.RolUsuarios.Any(u => u.IdUsuario == user.IdUsuario && u.IdRol == (int)Roles.Profesor));
 
                 string token = GenerarToken(user.IdUsuario, Dispositivo);
-                var usuario = new { user.IdUsuario, user.Correo, user.Nombre, user.Matricula, esProfesor };
+                var usuario = new { user.IdUsuario, user.Correo, user.Nombre, user.Matricula, EsProfesor };
                 return Request.CreateResponse(HttpStatusCode.OK, new Respuesta<object>("Logeado correctamente", new { usuario, token }));
             }
             else
